@@ -1,0 +1,55 @@
+{
+  "name": "@de2/hooks",
+  "version": "0.2.0",
+  "description": "de hooks",
+  "keywords": [
+    "de",
+    "hooks"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "lib/cjs/index.js",
+  "module": "lib/esm/index.js",
+  "typings": "lib/types/index.d.ts",
+  "scripts": {
+    "prebuild": "rm -rf lib",
+    "dev": "rm -rf lib && npm run dev:cjs",
+    "dev:cjs": "tsc -p ./config/tsconfig.es2015.json --watch",
+    "dev:esm": "tsc -p ./config/tsconfig.esm.json  --watch",
+    "build": "npm run build:esm && npm run build:es2015",
+    "build:cjs": "tsc -p ./config/tsconfig.es2015.json",
+    "build:esm": "tsc -p ./config/tsconfig.esm.json",
+    "lint": "tslint -p ./tsconfig.json",
+    "lint:fix": "tslint --fix -p ./tsconfig.json",
+    "test": "npm run test:lint && npm run test:spec",
+    "test:spec": "jest",
+    "test:update": "jest --updateSnapshot",
+    "test:lint": "npm run lint:fix",
+    "precommit": "npm test",
+    "prepush": "npm test",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "src",
+    "lib"
+  ],
+  "devDependencies": {
+    "@types/jest": "^24.9.1",
+    "husky": "^3.1.0",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.3.0",
+    "tslint": "^5.20.1",
+    "typescript": "^3.9.5"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "testRegex": "/__tests__/.+\\.spec.ts$",
+    "moduleFileExtensions": [
+      "js",
+      "ts"
+    ]
+  }
+}
