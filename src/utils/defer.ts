@@ -1,3 +1,3 @@
-export function defer (fn: () => void, shouldDefer = true) {
-  shouldDefer ? setTimeout(fn, 1) : fn()
+export function defer (fn: () => void) {
+  setTimeout(fn, 1)
 }

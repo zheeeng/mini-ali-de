@@ -1,6 +1,6 @@
-import { createFiber, createNode, createHead, Scan } from '../src/hooks/fiber'
+import { createDispatcher, createNode, createHead, Scan } from '../src/core/dispatcher'
 
-describe('fiber works fine', () => {
+describe('dispatcher works fine', () => {
   describe('case 1: replaceHook works fine', () => {
     const stubHead = createHead()
 
@@ -12,24 +12,24 @@ describe('fiber works fine', () => {
     const replaceScan: Scan<ReplaceHookCtx> = (_, curr) => curr
 
     it('test the basic work flow', () => {
-      const fiber1 = createFiber(null)
+      const dispatcher1 = createDispatcher(null)
 
-      expect(fiber1.head).toMatchObject(stubHead)
+      expect(dispatcher1.head).toMatchObject(stubHead)
 
       const node1 = createNode<ReplaceHookCtx>(
-        fiber1,
+        dispatcher1,
         { tag: 'replace', value: 1 },
         replaceScan,
       )
 
       const stubHeadHookAfterRuntimeHookCreated = { ...stubHead, next: node1 }
 
-      expect(fiber1.head).toMatchObject(stubHeadHookAfterRuntimeHookCreated)
+      expect(dispatcher1.head).toMatchObject(stubHeadHookAfterRuntimeHookCreated)
       expect(node1.context.tag).toBe('replace')
       expect(node1.context.value).toBe(1)
 
       const node2 = createNode<ReplaceHookCtx>(
-        fiber1,
+        dispatcher1,
         { tag: 'replace', value: 2 },
         replaceScan,
       )
@@ -38,7 +38,7 @@ describe('fiber works fine', () => {
       expect(node2.context.value).toBe(2)
 
       const node3 = createNode<ReplaceHookCtx>(
-        fiber1,
+        dispatcher1,
         { tag: 'replace', value: 3 },
         replaceScan,
       )
@@ -46,7 +46,7 @@ describe('fiber works fine', () => {
       expect(node3.context.tag).toBe('replace')
       expect(node3.context.value).toBe(3)
 
-      const contextOfHooks1 = fiber1.inspectContext()
+      const contextOfHooks1 = dispatcher1.inspectContext()
 
       expect(contextOfHooks1).toStrictEqual([
         { tag: 'replace', value: 1 },
@@ -54,12 +54,12 @@ describe('fiber works fine', () => {
         { tag: 'replace', value: 3 },
       ])
 
-      const fiber2 = createFiber(fiber1)
+      const dispatcher2 = createDispatcher(dispatcher1)
 
-      expect(fiber2.head.next).toBe(node1)
+      expect(dispatcher2.head.next).toBe(node1)
 
       const node4 = createNode<ReplaceHookCtx>(
-        fiber2,
+        dispatcher2,
         { tag: 'replace', value: 4 },
         replaceScan,
       )
@@ -68,7 +68,7 @@ describe('fiber works fine', () => {
       expect(node4.context.value).toBe(4)
 
       const node5 = createNode<ReplaceHookCtx>(
-        fiber2,
+        dispatcher2,
         { tag: 'replace', value: 5 },
         replaceScan,
       )
@@ -77,7 +77,7 @@ describe('fiber works fine', () => {
       expect(node5.context.value).toBe(5)
 
       const node6 = createNode<ReplaceHookCtx>(
-        fiber2,
+        dispatcher2,
         { tag: 'replace', value: 6 },
         replaceScan,
       )
@@ -85,7 +85,7 @@ describe('fiber works fine', () => {
       expect(node6.context.tag).toBe('replace')
       expect(node6.context.value).toBe(6)
 
-      const contextOfHooks2 = fiber1.inspectContext()
+      const contextOfHooks2 = dispatcher1.inspectContext()
 
       expect(contextOfHooks2).toStrictEqual([
         { tag: 'replace', value: 4 },
@@ -112,10 +112,10 @@ describe('fiber works fine', () => {
     })
 
     it('test the context value adding', () => {
-      const fiber1 = createFiber(null)
+      const dispatcher1 = createDispatcher(null)
 
       const node1 = createNode<ReplaceHookCtx>(
-        fiber1,
+        dispatcher1,
         { tag: 'sum', value: 1 },
         sumScan,
       )
@@ -124,7 +124,7 @@ describe('fiber works fine', () => {
       expect(node1.context.value).toBe(1)
 
       const node2 = createNode<ReplaceHookCtx>(
-        fiber1,
+        dispatcher1,
         { tag: 'sum', value: 2 },
         sumScan,
       )
@@ -133,7 +133,7 @@ describe('fiber works fine', () => {
       expect(node2.context.value).toBe(2)
 
       const node3 = createNode<ReplaceHookCtx>(
-        fiber1,
+        dispatcher1,
         { tag: 'sum', value: 3 },
         sumScan,
       )
@@ -141,7 +141,7 @@ describe('fiber works fine', () => {
       expect(node3.context.tag).toBe('sum')
       expect(node3.context.value).toBe(3)
 
-      const contextOfHooks1 = fiber1.inspectContext()
+      const contextOfHooks1 = dispatcher1.inspectContext()
 
       expect(contextOfHooks1).toStrictEqual([
         { tag: 'sum', value: 1 },
@@ -149,10 +149,10 @@ describe('fiber works fine', () => {
         { tag: 'sum', value: 3 },
       ])
 
-      const fiber2 = createFiber(fiber1)
+      const dispatcher2 = createDispatcher(dispatcher1)
 
       const node4 = createNode<ReplaceHookCtx>(
-        fiber2,
+        dispatcher2,
         { tag: 'sum', value: 4 },
         sumScan,
       )
@@ -161,7 +161,7 @@ describe('fiber works fine', () => {
       expect(node4.context.value).toBe(5)
 
       const node5 = createNode<ReplaceHookCtx>(
-        fiber2,
+        dispatcher2,
         { tag: 'sum', value: 5 },
         sumScan,
       )
@@ -170,7 +170,7 @@ describe('fiber works fine', () => {
       expect(node5.context.value).toBe(7)
 
       const node6 = createNode<ReplaceHookCtx>(
-        fiber2,
+        dispatcher2,
         { tag: 'sum', value: 6 },
         sumScan,
       )
@@ -178,7 +178,7 @@ describe('fiber works fine', () => {
       expect(node6.context.tag).toBe('sum')
       expect(node6.context.value).toBe(9)
 
-      const contextOfHooks2 = fiber1.inspectContext()
+      const contextOfHooks2 = dispatcher1.inspectContext()
 
       expect(contextOfHooks2).toStrictEqual([
         { tag: 'sum', value: 5 },
@@ -207,10 +207,10 @@ describe('fiber works fine', () => {
         })
 
     it('test the context value adding when context value mutated', () => {
-      const fiber1 = createFiber(null)
+      const dispatcher1 = createDispatcher(null)
 
       const node1 = createNode<ReplaceHookCtx>(
-        fiber1,
+        dispatcher1,
         { tag: 'sumIfChanged', value: 1 },
         sumIfChangedHookScan,
       )
@@ -219,7 +219,7 @@ describe('fiber works fine', () => {
       expect(node1.context.value).toBe(1)
 
       const node2 = createNode<ReplaceHookCtx>(
-        fiber1,
+        dispatcher1,
         { tag: 'sumIfChanged', value: 2 },
         sumIfChangedHookScan,
       )
@@ -228,7 +228,7 @@ describe('fiber works fine', () => {
       expect(node2.context.value).toBe(2)
 
       const node3 = createNode<ReplaceHookCtx>(
-        fiber1,
+        dispatcher1,
         { tag: 'sumIfChanged', value: 3 },
         sumIfChangedHookScan,
       )
@@ -236,7 +236,7 @@ describe('fiber works fine', () => {
       expect(node3.context.tag).toBe('sumIfChanged')
       expect(node3.context.value).toBe(3)
 
-      const contextOfHooks1 = fiber1.inspectContext()
+      const contextOfHooks1 = dispatcher1.inspectContext()
 
       expect(contextOfHooks1).toStrictEqual([
         { tag: 'sumIfChanged', value: 1 },
@@ -244,10 +244,10 @@ describe('fiber works fine', () => {
         { tag: 'sumIfChanged', value: 3 },
       ])
 
-      const fiber2 = createFiber(fiber1)
+      const dispatcher2 = createDispatcher(dispatcher1)
 
       const node4 = createNode<ReplaceHookCtx>(
-        fiber2,
+        dispatcher2,
         { tag: 'sumIfChanged', value: 1 },
         sumIfChangedHookScan,
       )
@@ -257,7 +257,7 @@ describe('fiber works fine', () => {
       expect(node4).toBe(node1)
 
       const node5 = createNode<ReplaceHookCtx>(
-        fiber2,
+        dispatcher2,
         { tag: 'sumIfChanged', value: 5 },
         sumIfChangedHookScan,
       )
@@ -266,7 +266,7 @@ describe('fiber works fine', () => {
       expect(node5.context.value).toBe(7)
 
       const node6 = createNode<ReplaceHookCtx>(
-        fiber2,
+        dispatcher2,
         { tag: 'sumIfChanged', value: 3 },
         sumIfChangedHookScan,
       )
@@ -275,7 +275,7 @@ describe('fiber works fine', () => {
       expect(node6.context.value).toBe(3)
       expect(node6).toBe(node3)
 
-      const contextOfHooks2 = fiber1.inspectContext()
+      const contextOfHooks2 = dispatcher1.inspectContext()
 
       expect(contextOfHooks2).toStrictEqual([
         { tag: 'sumIfChanged', value: 1 },

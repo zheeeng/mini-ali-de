@@ -3,57 +3,63 @@ export type Scan<Ctx = any> = (
   curr: Node<Ctx>,
 ) => Node<Ctx>
 
-type Tail = {
-  type: 'tail',
+enum NodeType {
+  HEAD = 'HEAD',
+  NODE = 'NODE',
+  TAIL = 'TAIL',
 }
 
-export const createTail = (): Tail => ({ type: 'tail' })
+type Tail = {
+  readonly type: NodeType.TAIL,
+}
+
+export const createTail = (): Tail => ({ type:  NodeType.TAIL })
 
 type Head = {
-  type: 'head',
+  readonly type: NodeType.HEAD,
   next: Node | Tail,
 }
 
-export const createHead = (): Head => ({ type: 'head', next: createTail() })
+export const createHead = (): Head => ({ type: NodeType.HEAD, next: createTail() })
 
 export type Node<Ctx = any> = {
-  type: 'node',
+  readonly type: NodeType.NODE,
   context: Ctx,
   scan: Scan<Ctx>,
   next: Node<Ctx> | Tail,
 }
 
-export interface Fiber {
+export interface Dispatcher {
   head: Head,
   iter: (node: Node) => Node,
   inspectContext: () => any[]
 }
 
 export const createNode = <Ctx = any>(
-  fiber: Fiber,
+  dispatcher: Dispatcher,
   context: Ctx,
   scan: Scan<Ctx>,
 ): Node<Ctx> => {
   const node: Node<Ctx> = {
-    type: 'node',
+    type: NodeType.NODE,
     context,
     scan,
     next: {
-      type: 'tail',
+      type: NodeType.TAIL,
     },
   }
 
-  return fiber.iter(node)
+  return dispatcher.iter(node)
 }
 
-export const createFiber = (fiberProto: Fiber | null): Fiber => {
-  let cursorNode: Head | Node = fiberProto?.head || createHead()
+export const createDispatcher = (dispatcherProto: Dispatcher | null): Dispatcher => {
+  let cursorNode: Head | Node = dispatcherProto?.head ?? createHead()
 
-  const fiberInstance: Fiber = {
+  const dispatcherInstance: Dispatcher = {
     head: cursorNode,
     iter (node: Node) {
       // TODO:: add record stack
-      const currentNode: Node = cursorNode.next.type === 'node'
+      const currentNode: Node = cursorNode.next.type === NodeType.NODE
         ? cursorNode.next.scan(cursorNode.next, node)
         : node
 
@@ -64,9 +70,9 @@ export const createFiber = (fiberProto: Fiber | null): Fiber => {
     },
     inspectContext () {
       const context: any[] = []
-      let inspectNodeCursor: Node | Tail = fiberInstance.head.next
+      let inspectNodeCursor: Node | Tail = dispatcherInstance.head.next
 
-      while (inspectNodeCursor.type === 'node') {
+      while (inspectNodeCursor.type === NodeType.NODE) {
         context.push(inspectNodeCursor.context)
         inspectNodeCursor = inspectNodeCursor.next
       }
@@ -75,5 +81,5 @@ export const createFiber = (fiberProto: Fiber | null): Fiber => {
     },
   }
 
-  return fiberInstance
+  return dispatcherInstance
 }

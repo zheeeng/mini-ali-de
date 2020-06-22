@@ -11,3 +11,7 @@ export function is (x: any, y: any) {
   // tslint:disable-next-line: no-unsafe-any
   return x !== x && y !== y
 }
+
+export function isArraySame (xs: ReadonlyArray<any>, ys: ReadonlyArray<any>) {
+  return xs.length === ys.length && xs.every((x, i) => is(x, ys[i]))
+}
