@@ -95,6 +95,90 @@ describe('dispatcher works fine', () => {
 
     })
 
+    it('test the dispatch evolving work flow', () => {
+      const dispatcher1 = createDispatcher(null)
+
+      expect(dispatcher1.head).toMatchObject(stubHead)
+
+      const node1 = createNode<ReplaceHookCtx>(
+        dispatcher1,
+        { tag: 'replace', value: 1 },
+        replaceScan,
+      )
+
+      const stubHeadHookAfterRuntimeHookCreated = { ...stubHead, next: node1 }
+
+      expect(dispatcher1.head).toMatchObject(stubHeadHookAfterRuntimeHookCreated)
+      expect(node1.context.tag).toBe('replace')
+      expect(node1.context.value).toBe(1)
+
+      const node2 = createNode<ReplaceHookCtx>(
+        dispatcher1,
+        { tag: 'replace', value: 2 },
+        replaceScan,
+      )
+
+      expect(node2.context.tag).toBe('replace')
+      expect(node2.context.value).toBe(2)
+
+      const node3 = createNode<ReplaceHookCtx>(
+        dispatcher1,
+        { tag: 'replace', value: 3 },
+        replaceScan,
+      )
+
+      expect(node3.context.tag).toBe('replace')
+      expect(node3.context.value).toBe(3)
+
+      const contextOfHooks1 = dispatcher1.inspectContext()
+
+      expect(contextOfHooks1).toStrictEqual([
+        { tag: 'replace', value: 1 },
+        { tag: 'replace', value: 2 },
+        { tag: 'replace', value: 3 },
+      ])
+
+      const dispatcher2 = dispatcher1.evolve()
+
+      expect(dispatcher2.head.next).toBe(node1)
+
+      const node4 = createNode<ReplaceHookCtx>(
+        dispatcher2,
+        { tag: 'replace', value: 4 },
+        replaceScan,
+      )
+
+      expect(node4.context.tag).toBe('replace')
+      expect(node4.context.value).toBe(4)
+
+      const node5 = createNode<ReplaceHookCtx>(
+        dispatcher2,
+        { tag: 'replace', value: 5 },
+        replaceScan,
+      )
+
+      expect(node5.context.tag).toBe('replace')
+      expect(node5.context.value).toBe(5)
+
+      const node6 = createNode<ReplaceHookCtx>(
+        dispatcher2,
+        { tag: 'replace', value: 6 },
+        replaceScan,
+      )
+
+      expect(node6.context.tag).toBe('replace')
+      expect(node6.context.value).toBe(6)
+
+      const contextOfHooks2 = dispatcher1.inspectContext()
+
+      expect(contextOfHooks2).toStrictEqual([
+        { tag: 'replace', value: 4 },
+        { tag: 'replace', value: 5 },
+        { tag: 'replace', value: 6 },
+      ])
+
+    })
+
   })
 
   describe('case 2: sum works fine', () => {

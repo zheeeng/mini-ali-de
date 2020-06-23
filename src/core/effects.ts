@@ -6,7 +6,7 @@ export type Effects = {
 
 export const createEffects = (): Effects => {
   let effects: Array<() => void> = []
-  const register: (effect: () => void) => void = effect => {
+  const register: Effects['register'] = effect => {
     effects.push(effect)
   }
   const trigger = () => {

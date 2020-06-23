@@ -32,7 +32,9 @@ export type Node<Ctx = any> = {
 export interface Dispatcher {
   head: Head,
   iter: (node: Node) => Node,
+  inspectCursor: () => Head | Node
   inspectContext: () => any[]
+  evolve: () => Dispatcher,
 }
 
 export const createNode = <Ctx = any>(
@@ -68,6 +70,9 @@ export const createDispatcher = (dispatcherProto: Dispatcher | null): Dispatcher
 
       return currentNode
     },
+    inspectCursor () {
+      return cursorNode
+    },
     inspectContext () {
       const context: any[] = []
       let inspectNodeCursor: Node | Tail = dispatcherInstance.head.next
@@ -78,6 +83,9 @@ export const createDispatcher = (dispatcherProto: Dispatcher | null): Dispatcher
       }
 
       return context
+    },
+    evolve () {
+      return createDispatcher(dispatcherInstance)
     },
   }
 
