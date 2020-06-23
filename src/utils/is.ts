@@ -12,6 +12,8 @@ export function is (x: any, y: any) {
   return x !== x && y !== y
 }
 
-export function isArraySame (xs: ReadonlyArray<any>, ys: ReadonlyArray<any>) {
+export function isArraySame (xs?: ReadonlyArray<any>, ys?: ReadonlyArray<any>) {
+  if (!xs || !ys) return false
+
   return xs.length === ys.length && xs.every((x, i) => is(x, ys[i]))
 }

@@ -17,9 +17,9 @@ interface UseMemoSignature {
 export const useMemo = defineHook<UseMemoContext, UseMemoSignature>({
   tagName: HookTag.MEMO,
   scan: (prev, curr) => {
-    const acc = (curr.deps && prev.deps)
-      ? isArraySame(prev.deps, curr.deps) ?  prev : curr
-      : curr
+    const acc = prev === null
+      ? curr
+      : isArraySame(prev.deps, curr.deps) ?  prev : curr
 
     return acc.memoized === nullSymbol ? { ...acc, memoized: acc.factory() } : acc
   },

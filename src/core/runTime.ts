@@ -1,6 +1,6 @@
-import { Dispatcher, createDispatcher } from './dispatcher'
+import { Dispatcher, createDispatcher, isTail } from './dispatcher'
 import { assertIsNotNull, assert  } from '../utils/assert'
-import { createEffects, Effects } from './effects'
+import { createEffects, Effects } from '../helpers/effects'
 
 type Runtime = {
   install: (installName: string, installation: any) => void,
@@ -34,7 +34,7 @@ export function getRuntime (): Runtime {
   return runtime
 }
 
-export function runInRuntime (run: () => any) {
+export function createRuntime (run: () => any) {
   let runningDispatcher: Dispatcher | null
 
   const installations: Record<string, any> = {}
@@ -58,7 +58,7 @@ export function runInRuntime (run: () => any) {
     getDispatcher: () => runningDispatcher ?? createDispatcher(null),
   }
 
-  return () => {
+  const runInRuntime = () => {
     commitRuntime(runTime)
     const dispatcher = runTime.getDispatcher()
     runTime.commitDispatcher(dispatcher)
@@ -67,8 +67,11 @@ export function runInRuntime (run: () => any) {
     run()
     effects.post.trigger()
     effects.post.clean()
+    assert(isTail(dispatcher.inspectCursor().next), 'Rendered fewer hooks than expected. This may be caused by an accidental early return statement.')
     runTime.commitDispatcher(dispatcher.evolve())
 
     cleanRuntime()
   }
+
+  return runInRuntime
 }

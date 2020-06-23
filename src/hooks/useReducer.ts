@@ -34,14 +34,10 @@ export const useReducer = defineHook<ReducerContext, UseReducerSignature>({
   tagName: HookTag.REDUCER,
   scan: (prev, curr) => {
     const reducer = curr.reducer
-    const stateRef = prev.stateRef
-    const dispatch = prev.dispatch === nullSymbol
-      ? (action: any) => {
-        stateRef.ref = reducer(stateRef.ref, action)
-      }
-      : prev.dispatch
-    if (stateRef.ref === nullSymbol) {
-      const { initialState, initializer, initializerArg } = prev
+    const stateRef = prev ? prev.stateRef : curr.stateRef
+    const dispatch = prev ? prev.dispatch : (action: any) => { stateRef.ref = reducer(stateRef.ref, action) }
+    if (!prev) {
+      const { initialState, initializer, initializerArg } = curr
 
       if (initialState === nullSymbol) {
         stateRef.ref = initialState

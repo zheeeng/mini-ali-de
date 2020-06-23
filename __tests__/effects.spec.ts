@@ -1,4 +1,4 @@
-import { createEffects } from '../src/core/effects'
+import { createEffects } from '../src/helpers/effects'
 
 describe('createEffects works fine', () => {
   it('test basic features', () => {

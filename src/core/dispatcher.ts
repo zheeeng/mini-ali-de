@@ -1,5 +1,5 @@
 export type Scan<Ctx = any> = (
-  prev: Node<Ctx>,
+  prev: Node<Ctx> | null,
   curr: Node<Ctx>,
 ) => Node<Ctx>
 
@@ -28,6 +28,10 @@ export type Node<Ctx = any> = {
   scan: Scan<Ctx>,
   next: Node<Ctx> | Tail,
 }
+
+export const isHead = (node: Head | Node | Tail) => node.type === NodeType.HEAD
+export const isNode = (node: Head | Node | Tail) => node.type === NodeType.NODE
+export const isTail = (node: Head | Node | Tail) => node.type === NodeType.TAIL
 
 export interface Dispatcher {
   head: Head,
@@ -62,8 +66,8 @@ export const createDispatcher = (dispatcherProto: Dispatcher | null): Dispatcher
     iter (node: Node) {
       // TODO:: add record stack
       const currentNode: Node = cursorNode.next.type === NodeType.NODE
-        ? cursorNode.next.scan(cursorNode.next, node)
-        : node
+        ? node.scan(cursorNode.next, node)
+        : node.scan(null, node)
 
       // link chain
       cursorNode = cursorNode.next = currentNode

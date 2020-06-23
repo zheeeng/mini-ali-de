@@ -1,6 +1,7 @@
-import { assert, assertIsNotNull } from '../utils/assert'
+import { assert } from '../utils/assert'
 import { Scan, createNode } from './dispatcher'
 import { getRuntime } from './runtime'
+import { createPool } from '../helpers/pool'
 
 interface BaseHookContext<Content extends NonNullable<any>> {
   tag: string,
@@ -14,10 +15,11 @@ type Registers = {
 }
 
 export type HookScan<Context = any> = (
-  prev: Context, curr: Context,
+  prev: Context | null, curr: Context,
   registers: Registers,
 ) => Context
-const registeredHookTag: Record<string, true> = {}
+const registeredHookTag = createPool()
+export const resetRegisteredHookTag = registeredHookTag.clean
 
 export interface HookDefine<
   Context,
@@ -39,22 +41,17 @@ export function defineHook <
 > (hookDefine: HookDefine<Context, HookSignature>): Hook<HookSignature> {
   const { tagName, scan, collect, spread } = hookDefine
 
-  assert(!(tagName in registeredHookTag), 'Must not create duplicated hook tagName!')
-  registeredHookTag[tagName] = true
+  assert(!registeredHookTag.has(tagName), 'Must not create duplicated hook tagName!')
+  registeredHookTag.add(tagName)
 
   const hookScan: HookScan<BaseHookContext<Context>> = (prevContext, currContext, registers) => {
-    assert(prevContext.tag === currContext.tag, 'Must not run hook in condition and loop statement!')
+    assert(prevContext === null || prevContext.tag === currContext.tag, 'Must not run hook in condition and loop statement!')
 
-    const nextContent = scan(prevContext.content, currContext.content, registers)
-
-    assertIsNotNull(nextContent, 'hookScan must not return null value!')
+    const nextContent = scan(prevContext !== null ? prevContext.content : null, currContext.content, registers)
 
     return {
       ...currContext,
-      context: {
-        ...currContext,
-        content: nextContent,
-      },
+      content: nextContent,
     }
   }
 
@@ -87,7 +84,7 @@ export function createHook <Context> (hookScan: HookScan<Context>) {
     }
 
     const nodeScan: Scan<Context> = (prevContext, currContext) => {
-      const nextContext = hookScan(prevContext.context, currContext.context, registers)
+      const nextContext = hookScan(prevContext !== null ? prevContext.context : null, currContext.context, registers)
 
       return {
         ...currContext,

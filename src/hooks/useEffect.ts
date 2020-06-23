@@ -2,7 +2,8 @@ import { defineHook } from '../core/hook'
 import { HookTag } from './builtIn'
 import type { DependencyList, EffectCallback } from './type'
 import { isArraySame } from '../utils/is'
-import { defer } from '../utils/defer'
+import { execute } from '../utils/execute'
+import { assert } from '../utils/assert'
 
 enum EffectType {
   ON_UNDECIDED = 'ON_UNDECIDED',
@@ -14,12 +15,12 @@ enum EffectType {
   ON_LIFECYCLE = 'ON_LIFECYCLE',
 }
 
-function getEffectType (deps1?: readonly any[], deps2?: readonly any[]): EffectType {
-  if (!deps1 && !deps2) return EffectType.ON_RENDER
+function getEffectType (deps?: readonly any[]): EffectType {
+  if (!deps) return EffectType.ON_RENDER
 
-  if (deps1?.length === 0 && deps2?.length === 0) return EffectType.ON_LIFECYCLE
+  if (deps?.length === 0) return EffectType.ON_LIFECYCLE
 
-  if (deps1?.length && deps2?.length) return EffectType.ON_MUTATE
+  if (deps?.length) return EffectType.ON_MUTATE
 
   throw Error('Must not use the variable dependencies')
 }
@@ -38,31 +39,34 @@ interface UseEffect0Signature {
 export const useEffect0 = defineHook<UseEffect0Context, UseEffect0Signature>({
   tagName: HookTag.EFFECT,
   scan: (prev, curr, { registerPreEffect, registerPostEffect, registerFinEffect}) => {
-    const effectType = prev.effectType === EffectType.ON_UNDECIDED
-      ? getEffectType(curr.deps, prev.deps)
-      : prev.effectType
+    const effectType = prev ? prev.effectType : getEffectType(curr.deps)
 
-    if (prev.effectType === EffectType.ON_UNDECIDED && effectType === EffectType.ON_LIFECYCLE) {
-      const executeEffect = () => {
-        registerPostEffect(() => {
-          const unsubscribe = curr.subscribe()
-          unsubscribe && registerFinEffect(unsubscribe)
-        })
-      }
+    assert(effectType !== EffectType.ON_UNDECIDED)
 
-      curr.delay ? defer(executeEffect) : executeEffect()
+    if (!prev && effectType === EffectType.ON_LIFECYCLE) {
+      execute(
+        () => {
+          registerPostEffect(() => {
+            const unsubscribe = curr.subscribe()
+            unsubscribe && registerFinEffect(unsubscribe)
+          })
+        },
+        curr.delay,
+      )
     }
 
-    if ((effectType === EffectType.ON_MUTATE && prev.deps && curr.deps && isArraySame(prev.deps, curr.deps))
-      || effectType === EffectType.ON_RENDER) {
-      const executeEffect = () => {
-        registerPostEffect(() => {
-          const unsubscribe = curr.subscribe()
-          unsubscribe && registerPreEffect(unsubscribe)
-        })
-      }
-
-      curr.delay ? defer(executeEffect) : executeEffect()
+    if (effectType === EffectType.ON_RENDER ||
+      effectType === EffectType.ON_MUTATE && (!prev || isArraySame(prev.deps, curr.deps))
+    ) {
+      execute(
+        () => {
+          registerPostEffect(() => {
+            const unsubscribe = curr.subscribe()
+            unsubscribe && registerPreEffect(unsubscribe)
+          })
+        },
+        curr.delay,
+      )
     }
 
     return {

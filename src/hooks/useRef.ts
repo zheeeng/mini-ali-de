@@ -12,9 +12,9 @@ interface UseRefSignature {
   <T = undefined>(): MutableRefObject<T | undefined>
 }
 
-export const useMemo = defineHook<UseRefContext, UseRefSignature>({
+export const useRef = defineHook<UseRefContext, UseRefSignature>({
   tagName: HookTag.REF,
-  scan: prev => prev,
+  scan: (prev, curr) => prev || curr,
   collect: (initialValue?: any) => ({ current: initialValue }),
   spread: context =>
     // tslint:disable-next-line: no-unsafe-any

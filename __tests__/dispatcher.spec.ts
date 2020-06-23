@@ -1,4 +1,41 @@
-import { createDispatcher, createNode, createHead, Scan } from '../src/core/dispatcher'
+import { createDispatcher, createNode, createHead, Scan, isHead, isNode, isTail, createTail } from '../src/core/dispatcher'
+
+describe('dispatcher Helper works fine', () => {
+  const stubDispatcher = { iter: jest.fn((i: unknown) => i) as any }
+  const stubScan = jest.fn()
+  const head = createHead()
+  const node = createNode(stubDispatcher as any, null, stubScan as any)
+  const tail = createTail()
+
+  it('createNode triggers Dispatcher::iter', () => {
+    expect(stubDispatcher.iter).toHaveBeenCalledTimes(1)
+    expect(stubScan).toHaveBeenCalledTimes(0)
+  })
+
+  it('isHead works fine', () => {
+    expect(isHead(head)).toBe(true)
+    expect(isHead(node)).toBe(false)
+    expect(isHead(tail)).toBe(false)
+    expect(isHead(head.next)).toBe(false)
+    expect(isHead(node.next)).toBe(false)
+  })
+
+  it('isNode works fine', () => {
+    expect(isNode(head)).toBe(false)
+    expect(isNode(node)).toBe(true)
+    expect(isNode(tail)).toBe(false)
+    expect(isNode(head.next)).toBe(false)
+    expect(isNode(node.next)).toBe(false)
+  })
+
+  it('isTail works fine', () => {
+    expect(isTail(head)).toBe(false)
+    expect(isTail(node)).toBe(false)
+    expect(isTail(tail)).toBe(true)
+    expect(isTail(head.next)).toBe(true)
+    expect(isTail(node.next)).toBe(true)
+  })
+})
 
 describe('dispatcher works fine', () => {
   describe('case 1: replaceHook works fine', () => {
@@ -187,13 +224,15 @@ describe('dispatcher works fine', () => {
       value: number,
     }
 
-    const sumScan: Scan<ReplaceHookCtx> = (prev, curr) => ({
-      ...prev,
-      context: {
-        ...prev.context,
-        value: prev.context.value + curr.context.value,
-      },
-    })
+    const sumScan: Scan<ReplaceHookCtx> = (prev, curr) => prev
+      ? ({
+        ...prev,
+        context: {
+          ...prev.context,
+          value: prev.context.value + curr.context.value,
+        },
+      })
+      : curr
 
     it('test the context value adding', () => {
       const dispatcher1 = createDispatcher(null)
@@ -280,15 +319,17 @@ describe('dispatcher works fine', () => {
     }
 
     const sumIfChangedHookScan: Scan<ReplaceHookCtx> =
-      (prev, curr) => prev.context.value === curr.context.value
-        ? prev
-        : ({
-          ...prev,
-          context: {
-            ...prev.context,
-            value: prev.context.value + curr.context.value,
-          },
-        })
+      (prev, curr) => prev
+        ? prev.context.value === curr.context.value
+          ? prev
+          : ({
+            ...prev,
+            context: {
+              ...prev.context,
+              value: prev.context.value + curr.context.value,
+            },
+          })
+        : curr
 
     it('test the context value adding when context value mutated', () => {
       const dispatcher1 = createDispatcher(null)
