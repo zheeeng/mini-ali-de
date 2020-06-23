@@ -69,4 +69,31 @@ describe('runtime works fine', () => {
     expect(fn).toHaveBeenCalledTimes(2)
   })
 
+  it('test the repeating running function be called in async procedure', done => {
+    const totalTimes = 5
+
+    const fn = jest.fn()
+    const delayCall = jest.fn((cb: () => void) => setTimeout(cb, 100))
+    let fnCalledTimes = 1
+
+    const runtimeFn = createRuntime(world)
+
+    function world () {
+      fn()
+      delayCall(() => {
+        if (fnCalledTimes >= totalTimes) {
+          done()
+
+          return
+        }
+        runtimeFn()
+        fnCalledTimes++
+        expect(fn).toHaveBeenCalledTimes(fnCalledTimes)
+      })
+    }
+
+    runtimeFn()
+    expect(fn).toHaveBeenCalledTimes(fnCalledTimes)
+  })
+
 })
