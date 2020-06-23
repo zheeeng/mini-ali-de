@@ -54,14 +54,19 @@ describe('runtime works fine', () => {
 
     expect(fn).toHaveBeenCalledTimes(0)
 
-    createRuntime(world)()
+    const runtimeFn = createRuntime(world)
 
     function world () {
       fn()
     }
 
+    runtimeFn()
+
     expect(fn).toHaveBeenCalledTimes(1)
 
+    runtimeFn()
+
+    expect(fn).toHaveBeenCalledTimes(2)
   })
 
 })
