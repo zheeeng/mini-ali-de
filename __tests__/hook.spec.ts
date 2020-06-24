@@ -11,17 +11,17 @@ describe('createHook works fine', () => {
     const hook = createHook<number>((a, b) => (a || 0) + b)
 
     createRuntime(() => {
-      const value = hook(5)
+      const node = hook(5)
 
-      expect(value.type).toBe('NODE')
-      expect(value.context).toBe(5)
-      expect(value.next).toEqual({ type: 'TAIL' })
+      expect(node.type).toBe('NODE')
+      expect(node.context).toBe(5)
+      expect(node.next).toEqual({ type: 'TAIL' })
 
-      const value2 = hook(2)
+      const node2 = hook(2)
 
-      expect(value2.type).toBe('NODE')
-      expect(value2.context).toBe(2)
-      expect(value2.next).toEqual({ type: 'TAIL' })
+      expect(node2.type).toBe('NODE')
+      expect(node2.context).toBe(2)
+      expect(node2.next).toEqual({ type: 'TAIL' })
     })
   })
 })

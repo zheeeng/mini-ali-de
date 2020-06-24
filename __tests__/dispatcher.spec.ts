@@ -219,12 +219,12 @@ describe('dispatcher works fine', () => {
   })
 
   describe('case 2: sum works fine', () => {
-    type ReplaceHookCtx = {
+    type SumHookCtx = {
       tag: 'sum',
       value: number,
     }
 
-    const sumScan: Scan<ReplaceHookCtx> = (prev, curr) => prev
+    const sumScan: Scan<SumHookCtx> = (prev, curr) => prev
       ? ({
         ...prev,
         context: {
@@ -237,7 +237,7 @@ describe('dispatcher works fine', () => {
     it('test the context value adding', () => {
       const dispatcher1 = createDispatcher(null)
 
-      const node1 = createNode<ReplaceHookCtx>(
+      const node1 = createNode<SumHookCtx>(
         dispatcher1,
         { tag: 'sum', value: 1 },
         sumScan,
@@ -246,7 +246,7 @@ describe('dispatcher works fine', () => {
       expect(node1.context.tag).toBe('sum')
       expect(node1.context.value).toBe(1)
 
-      const node2 = createNode<ReplaceHookCtx>(
+      const node2 = createNode<SumHookCtx>(
         dispatcher1,
         { tag: 'sum', value: 2 },
         sumScan,
@@ -255,7 +255,7 @@ describe('dispatcher works fine', () => {
       expect(node2.context.tag).toBe('sum')
       expect(node2.context.value).toBe(2)
 
-      const node3 = createNode<ReplaceHookCtx>(
+      const node3 = createNode<SumHookCtx>(
         dispatcher1,
         { tag: 'sum', value: 3 },
         sumScan,
@@ -274,7 +274,7 @@ describe('dispatcher works fine', () => {
 
       const dispatcher2 = createDispatcher(dispatcher1)
 
-      const node4 = createNode<ReplaceHookCtx>(
+      const node4 = createNode<SumHookCtx>(
         dispatcher2,
         { tag: 'sum', value: 4 },
         sumScan,
@@ -283,7 +283,7 @@ describe('dispatcher works fine', () => {
       expect(node4.context.tag).toBe('sum')
       expect(node4.context.value).toBe(5)
 
-      const node5 = createNode<ReplaceHookCtx>(
+      const node5 = createNode<SumHookCtx>(
         dispatcher2,
         { tag: 'sum', value: 5 },
         sumScan,
@@ -292,7 +292,7 @@ describe('dispatcher works fine', () => {
       expect(node5.context.tag).toBe('sum')
       expect(node5.context.value).toBe(7)
 
-      const node6 = createNode<ReplaceHookCtx>(
+      const node6 = createNode<SumHookCtx>(
         dispatcher2,
         { tag: 'sum', value: 6 },
         sumScan,
@@ -313,12 +313,12 @@ describe('dispatcher works fine', () => {
   })
 
   describe('case 3: sumIfChangedHook works fine', () => {
-    type ReplaceHookCtx = {
+    type SumIfChangedHookCtx = {
       tag: 'sumIfChanged',
       value: number,
     }
 
-    const sumIfChangedHookScan: Scan<ReplaceHookCtx> =
+    const sumIfChangedHookScan: Scan<SumIfChangedHookCtx> =
       (prev, curr) => prev
         ? prev.context.value === curr.context.value
           ? prev
@@ -334,7 +334,7 @@ describe('dispatcher works fine', () => {
     it('test the context value adding when context value mutated', () => {
       const dispatcher1 = createDispatcher(null)
 
-      const node1 = createNode<ReplaceHookCtx>(
+      const node1 = createNode<SumIfChangedHookCtx>(
         dispatcher1,
         { tag: 'sumIfChanged', value: 1 },
         sumIfChangedHookScan,
@@ -343,7 +343,7 @@ describe('dispatcher works fine', () => {
       expect(node1.context.tag).toBe('sumIfChanged')
       expect(node1.context.value).toBe(1)
 
-      const node2 = createNode<ReplaceHookCtx>(
+      const node2 = createNode<SumIfChangedHookCtx>(
         dispatcher1,
         { tag: 'sumIfChanged', value: 2 },
         sumIfChangedHookScan,
@@ -352,7 +352,7 @@ describe('dispatcher works fine', () => {
       expect(node2.context.tag).toBe('sumIfChanged')
       expect(node2.context.value).toBe(2)
 
-      const node3 = createNode<ReplaceHookCtx>(
+      const node3 = createNode<SumIfChangedHookCtx>(
         dispatcher1,
         { tag: 'sumIfChanged', value: 3 },
         sumIfChangedHookScan,
@@ -371,7 +371,7 @@ describe('dispatcher works fine', () => {
 
       const dispatcher2 = createDispatcher(dispatcher1)
 
-      const node4 = createNode<ReplaceHookCtx>(
+      const node4 = createNode<SumIfChangedHookCtx>(
         dispatcher2,
         { tag: 'sumIfChanged', value: 1 },
         sumIfChangedHookScan,
@@ -381,7 +381,7 @@ describe('dispatcher works fine', () => {
       expect(node4.context.value).toBe(1)
       expect(node4).toBe(node1)
 
-      const node5 = createNode<ReplaceHookCtx>(
+      const node5 = createNode<SumIfChangedHookCtx>(
         dispatcher2,
         { tag: 'sumIfChanged', value: 5 },
         sumIfChangedHookScan,
@@ -390,7 +390,7 @@ describe('dispatcher works fine', () => {
       expect(node5.context.tag).toBe('sumIfChanged')
       expect(node5.context.value).toBe(7)
 
-      const node6 = createNode<ReplaceHookCtx>(
+      const node6 = createNode<SumIfChangedHookCtx>(
         dispatcher2,
         { tag: 'sumIfChanged', value: 3 },
         sumIfChangedHookScan,

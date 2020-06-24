@@ -35,6 +35,8 @@ type Hook<HookSignature extends (...inputs: any[]) => any> = HookSignature & {
   redefineTag: (tag: string) => Hook<HookSignature>,
 }
 
+// 1. define hook
+// 2. consume tag
 export function defineHook <
   Context,
   HookSignature extends (...inputs: any[]) => any,
@@ -71,6 +73,7 @@ export function defineHook <
   return hookImpl as Hook<HookSignature>
 }
 
+// inject runtime registers
 export function createHook <Context> (hookScan: HookScan<Context>) {
 
   return function hook (context: Context) {

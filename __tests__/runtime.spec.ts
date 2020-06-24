@@ -19,6 +19,14 @@ describe('runtime works fine', () => {
     })()
   })
 
+  it('test getRuntime install plugins with different name success', () => {
+    createRuntime(() => {
+      const runTime = getRuntime()
+      runTime.install('plugin', { foo: 123 })
+      expect(() => { runTime.install('plugin2', { foo: 321 }) }).not.toThrowError()
+    })()
+  })
+
   it('test getRuntime get installation after install plugins', () => {
     createRuntime(() => {
       const runTime = getRuntime()
@@ -52,13 +60,13 @@ describe('runtime works fine', () => {
   it('test createRuntime can repeat run it\'s inner repeating running function', () => {
     const fn = jest.fn()
 
-    expect(fn).toHaveBeenCalledTimes(0)
-
     const runtimeFn = createRuntime(world)
 
     function world () {
       fn()
     }
+
+    expect(fn).toHaveBeenCalledTimes(0)
 
     runtimeFn()
 
