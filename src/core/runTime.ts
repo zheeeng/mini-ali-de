@@ -11,7 +11,7 @@ type Runtime = {
     fin: Effects,
   }
   commitDispatcher: (dispatcher: Dispatcher) => void,
-  getDispatcher: () => Dispatcher,
+  resolveDispatcher: () => Dispatcher,
 }
 
 const $runtime = {
@@ -34,7 +34,11 @@ export function getRuntime (): Runtime {
   return runtime
 }
 
-export function createRuntime (run: () => any) {
+type CreateRuntimeOption = {
+  onRuntimeEnd?: (contexts: any[]) => void,
+}
+
+export function createRuntime (run: () => any, createRuntimeOption?: CreateRuntimeOption) {
   let runningDispatcher: Dispatcher | null
 
   const installations: Record<string, any> = {}
@@ -55,12 +59,12 @@ export function createRuntime (run: () => any) {
     getInstallation: installName => installations[installName],
     getEffectsEntry: () => effects,
     commitDispatcher: dispatcher => runningDispatcher = dispatcher,
-    getDispatcher: () => runningDispatcher ?? createDispatcher(null),
+    resolveDispatcher: () => runningDispatcher ?? createDispatcher(null),
   }
 
   const runInRuntime = () => {
     commitRuntime(runTime)
-    const dispatcher = runTime.getDispatcher()
+    const dispatcher = runTime.resolveDispatcher()
     runTime.commitDispatcher(dispatcher)
     effects.pre.trigger()
     effects.pre.clean()
@@ -68,8 +72,8 @@ export function createRuntime (run: () => any) {
     effects.post.trigger()
     effects.post.clean()
     assert(isTail(dispatcher.inspectCursor().next), 'Rendered fewer hooks than expected. This may be caused by an accidental early return statement.')
+    createRuntimeOption?.onRuntimeEnd?.(dispatcher.inspectContexts())
     runTime.commitDispatcher(dispatcher.evolve())
-
     cleanRuntime()
   }
 

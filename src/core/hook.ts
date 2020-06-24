@@ -50,7 +50,7 @@ export function defineHook <
     const nextContent = scan(prevContext !== null ? prevContext.content : null, currContext.content, registers)
 
     return {
-      ...currContext,
+      ...(prevContext || currContext),
       content: nextContent,
     }
   }
@@ -75,7 +75,7 @@ export function createHook <Context> (hookScan: HookScan<Context>) {
 
   return function hook (context: Context) {
     const runtime = getRuntime()
-    const dispatcher = runtime.getDispatcher()
+    const dispatcher = runtime.resolveDispatcher()
     const effectsEntry = runtime.getEffectsEntry()
     const registers: Registers = {
       registerPreEffect: effectsEntry.pre.register,
@@ -87,7 +87,7 @@ export function createHook <Context> (hookScan: HookScan<Context>) {
       const nextContext = hookScan(prevContext !== null ? prevContext.context : null, currContext.context, registers)
 
       return {
-        ...currContext,
+        ...(prevContext || currContext),
         context: nextContext,
       }
     }

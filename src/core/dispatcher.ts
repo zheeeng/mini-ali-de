@@ -29,15 +29,15 @@ export type Node<Ctx = any> = {
   next: Node<Ctx> | Tail,
 }
 
-export const isHead = (node: Head | Node | Tail) => node.type === NodeType.HEAD
-export const isNode = (node: Head | Node | Tail) => node.type === NodeType.NODE
-export const isTail = (node: Head | Node | Tail) => node.type === NodeType.TAIL
+export const isHead = (node: Head | Node | Tail): node is Head => node.type === NodeType.HEAD
+export const isNode = (node: Head | Node | Tail): node is Node => node.type === NodeType.NODE
+export const isTail = (node: Head | Node | Tail): node is Tail => node.type === NodeType.TAIL
 
 export interface Dispatcher {
   head: Head,
   iter: (node: Node) => Node,
   inspectCursor: () => Head | Node
-  inspectContext: () => any[]
+  inspectContexts: () => any[]
   evolve: () => Dispatcher,
 }
 
@@ -65,7 +65,7 @@ export const createDispatcher = (dispatcherProto: Dispatcher | null): Dispatcher
     head: cursorNode,
     iter (node: Node) {
       // TODO:: add record stack
-      const currentNode: Node = cursorNode.next.type === NodeType.NODE
+      const currentNode: Node = isNode(cursorNode.next)
         ? node.scan(cursorNode.next, node)
         : node.scan(null, node)
 
@@ -77,16 +77,16 @@ export const createDispatcher = (dispatcherProto: Dispatcher | null): Dispatcher
     inspectCursor () {
       return cursorNode
     },
-    inspectContext () {
-      const context: any[] = []
+    inspectContexts () {
+      const contexts: any[] = []
       let inspectNodeCursor: Node | Tail = dispatcherInstance.head.next
 
-      while (inspectNodeCursor.type === NodeType.NODE) {
-        context.push(inspectNodeCursor.context)
+      while (isNode(inspectNodeCursor)) {
+        contexts.push(inspectNodeCursor.context)
         inspectNodeCursor = inspectNodeCursor.next
       }
 
-      return context
+      return contexts
     },
     evolve () {
       return createDispatcher(dispatcherInstance)

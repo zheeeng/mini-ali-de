@@ -83,7 +83,7 @@ describe('dispatcher works fine', () => {
       expect(node3.context.tag).toBe('replace')
       expect(node3.context.value).toBe(3)
 
-      const contextOfHooks1 = dispatcher1.inspectContext()
+      const contextOfHooks1 = dispatcher1.inspectContexts()
 
       expect(contextOfHooks1).toStrictEqual([
         { tag: 'replace', value: 1 },
@@ -122,7 +122,7 @@ describe('dispatcher works fine', () => {
       expect(node6.context.tag).toBe('replace')
       expect(node6.context.value).toBe(6)
 
-      const contextOfHooks2 = dispatcher1.inspectContext()
+      const contextOfHooks2 = dispatcher1.inspectContexts()
 
       expect(contextOfHooks2).toStrictEqual([
         { tag: 'replace', value: 4 },
@@ -167,7 +167,7 @@ describe('dispatcher works fine', () => {
       expect(node3.context.tag).toBe('replace')
       expect(node3.context.value).toBe(3)
 
-      const contextOfHooks1 = dispatcher1.inspectContext()
+      const contextOfHooks1 = dispatcher1.inspectContexts()
 
       expect(contextOfHooks1).toStrictEqual([
         { tag: 'replace', value: 1 },
@@ -206,7 +206,7 @@ describe('dispatcher works fine', () => {
       expect(node6.context.tag).toBe('replace')
       expect(node6.context.value).toBe(6)
 
-      const contextOfHooks2 = dispatcher1.inspectContext()
+      const contextOfHooks2 = dispatcher1.inspectContexts()
 
       expect(contextOfHooks2).toStrictEqual([
         { tag: 'replace', value: 4 },
@@ -264,7 +264,7 @@ describe('dispatcher works fine', () => {
       expect(node3.context.tag).toBe('sum')
       expect(node3.context.value).toBe(3)
 
-      const contextOfHooks1 = dispatcher1.inspectContext()
+      const contextOfHooks1 = dispatcher1.inspectContexts()
 
       expect(contextOfHooks1).toStrictEqual([
         { tag: 'sum', value: 1 },
@@ -301,7 +301,7 @@ describe('dispatcher works fine', () => {
       expect(node6.context.tag).toBe('sum')
       expect(node6.context.value).toBe(9)
 
-      const contextOfHooks2 = dispatcher1.inspectContext()
+      const contextOfHooks2 = dispatcher1.inspectContexts()
 
       expect(contextOfHooks2).toStrictEqual([
         { tag: 'sum', value: 5 },
@@ -361,7 +361,7 @@ describe('dispatcher works fine', () => {
       expect(node3.context.tag).toBe('sumIfChanged')
       expect(node3.context.value).toBe(3)
 
-      const contextOfHooks1 = dispatcher1.inspectContext()
+      const contextOfHooks1 = dispatcher1.inspectContexts()
 
       expect(contextOfHooks1).toStrictEqual([
         { tag: 'sumIfChanged', value: 1 },
@@ -400,7 +400,7 @@ describe('dispatcher works fine', () => {
       expect(node6.context.value).toBe(3)
       expect(node6).toBe(node3)
 
-      const contextOfHooks2 = dispatcher1.inspectContext()
+      const contextOfHooks2 = dispatcher1.inspectContexts()
 
       expect(contextOfHooks2).toStrictEqual([
         { tag: 'sumIfChanged', value: 1 },

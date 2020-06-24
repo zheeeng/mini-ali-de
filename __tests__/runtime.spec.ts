@@ -27,20 +27,20 @@ describe('runtime works fine', () => {
     })()
   })
 
-  it('test Runtime::getDispatcher works fine', () => {
+  it('test Runtime::resolveDispatcher works fine', () => {
     createRuntime(() => {
       const runTime = getRuntime()
-      const dispatcher = runTime.getDispatcher()
+      const dispatcher = runTime.resolveDispatcher()
 
       expect(dispatcher).not.toBeUndefined()
 
       runTime.commitDispatcher(dispatcher)
 
-      expect(runTime.getDispatcher()).toBe(dispatcher)
+      expect(runTime.resolveDispatcher()).toBe(dispatcher)
 
       runTime.commitDispatcher(42 as any)
 
-      expect(runTime.getDispatcher()).toEqual(42)
+      expect(runTime.resolveDispatcher()).toEqual(42)
 
       const effectsEntry = runTime.getEffectsEntry()
 

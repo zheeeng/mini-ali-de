@@ -40,13 +40,13 @@ export const useReducer = defineHook<ReducerContext, UseReducerSignature>({
       const { initialState, initializer, initializerArg } = curr
 
       if (initialState === nullSymbol) {
-        stateRef.ref = initialState
-      } else {
         assert(initializer)
         assert(initializer !== nullSymbol)
         assert(initializerArg !== nullSymbol)
 
         stateRef.ref = initializer(initializerArg)
+      } else {
+        stateRef.ref = initialState
       }
     }
 

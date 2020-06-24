@@ -11,7 +11,7 @@ type UseMemoContext<T = any> = {
 }
 
 interface UseMemoSignature {
-  <T>(...inputs: [() => T, DependencyList | undefined]): T
+  <T>(factory: () => T, deps?: DependencyList): T
 }
 
 export const useMemo = defineHook<UseMemoContext, UseMemoSignature>({

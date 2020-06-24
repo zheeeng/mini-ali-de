@@ -15,8 +15,7 @@ interface UseRefSignature {
 export const useRef = defineHook<UseRefContext, UseRefSignature>({
   tagName: HookTag.REF,
   scan: (prev, curr) => prev || curr,
-  collect: (initialValue?: any) => ({ current: initialValue }),
-  spread: context =>
-    // tslint:disable-next-line: no-unsafe-any
-    context.current,
+  // tslint:disable-next-line: no-unsafe-any
+  collect: (initialValue?: any) => ({ current: initialValue ?? null }),
+  spread: context => context,
 })
